@@ -8,8 +8,8 @@ import (
 )
 
 type Client struct {
-	Client *genai.Client
-	Model  string
+	client *genai.Client
+	model  string
 }
 
 func NewClient(ctx context.Context, apiKey, model string) (*Client, error) {
@@ -21,15 +21,15 @@ func NewClient(ctx context.Context, apiKey, model string) (*Client, error) {
 		return nil, fmt.Errorf("create Gemini client: %w", err)
 	}
 	return &Client{
-		Client: client,
-		Model:  model,
+		client: client,
+		model:  model,
 	}, nil
 }
 
-func (c *Client) Generator(ctx context.Context, prompt string) (string, error) {
-	resp, err := c.Client.Models.GenerateContent(
+func (c *Client) GenerateContent(ctx context.Context, prompt string) (string, error) {
+	resp, err := c.client.Models.GenerateContent(
 		ctx,
-		c.Model,
+		c.model,
 		genai.Text(prompt),
 		nil,
 	)
