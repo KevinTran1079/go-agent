@@ -26,15 +26,15 @@ func NewClient(ctx context.Context, apiKey, model string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) GenerateContent(ctx context.Context, prompt string) (string, error) {
+func (c *Client) GenerateContent(ctx context.Context, prompt []*genai.Content) (*genai.GenerateContentResponse, error) {
 	resp, err := c.client.Models.GenerateContent(
 		ctx,
 		c.model,
-		genai.Text(prompt),
+		prompt,
 		nil,
 	)
 	if err != nil {
-		return "", fmt.Errorf("generate content: %w", err)
+		return nil, fmt.Errorf("generate content: %w", err)
 	}
-	return resp.Text(), nil
+	return resp, nil
 }
