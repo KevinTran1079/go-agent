@@ -31,7 +31,8 @@ func main() {
 		"gemini-3.6-flash",
 	)
 	if err != nil {
-		fmt.Println("could not create model client: %w", err)
+		fmt.Fprintln(os.Stderr, "could not create model client:", err)
+		os.Exit(1)
 	}
 
 	var messages []*genai.Content
@@ -52,10 +53,16 @@ func Run(ctx context.Context, messages []*genai.Content, model llm.LLM) error {
 		if err != nil {
 			return fmt.Errorf("could not generate content: %w", err)
 		}
+		if len(resp.Candidates) == 0 {
+			return fmt.Errorf("response has no candidates")
+		}
+		if resp.Candidates[0].Content == nil {
+			return fmt.Errorf("response candidate content has no content")
+		}
+
 		messages = append(messages, resp.Candidates[0].Content)
 		fmt.Println("model:", resp.Text())
 		fmt.Print("you: ")
-
 		if !scanner.Scan() {
 			return scanner.Err()
 		}
