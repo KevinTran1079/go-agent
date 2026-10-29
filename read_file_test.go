@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -34,6 +35,35 @@ func TestReadFileExistingFile(t *testing.T) {
 			}
 			if got != tt.contents {
 				t.Errorf("ReadFile() = %q; want %q", got, tt.contents)
+			}
+		})
+	}
+}
+
+func TestReadFileNotFound(t *testing.T) {
+	tests := []struct {
+		name string
+		path string
+	}{
+		{
+			name: "missing file",
+			path: "missing.txt",
+		},
+		{
+			name: "missing parent directory",
+			path: filepath.Join("missing", "example.txt"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), tt.path)
+			got, err := ReadFile(path)
+			if !errors.Is(err, os.ErrNotExist) {
+				t.Errorf("ReadFile() error = %v; want an error wrapping os.ErrNotExist", err)
+			}
+			if got != "" {
+				t.Errorf("ReadFile() = %q; want empty string", got)
 			}
 		})
 	}
