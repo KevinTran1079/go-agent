@@ -24,12 +24,13 @@ func TestReadFileExistingFile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			path := filepath.Join(t.TempDir(), "example.txt")
-			if err := os.WriteFile(path, []byte(tt.contents), 0600); err != nil {
+			t.Chdir(t.TempDir())
+			file := "example.txt"
+			if err := os.WriteFile(file, []byte(tt.contents), 0600); err != nil {
 				t.Fatalf("create test file: %v", err)
 			}
 
-			got, err := ReadFile(path)
+			got, err := ReadFile(file)
 			if err != nil {
 				t.Fatalf("ReadFile() returned unexpected error: %v", err)
 			}
@@ -43,22 +44,22 @@ func TestReadFileExistingFile(t *testing.T) {
 func TestReadFileNotFound(t *testing.T) {
 	tests := []struct {
 		name string
-		path string
+		file string
 	}{
 		{
 			name: "missing file",
-			path: "missing.txt",
+			file: "missing.txt",
 		},
 		{
 			name: "missing parent directory",
-			path: filepath.Join("missing", "example.txt"),
+			file: filepath.Join("missing", "example.txt"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			path := filepath.Join(t.TempDir(), tt.path)
-			got, err := ReadFile(path)
+			t.Chdir(t.TempDir())
+			got, err := ReadFile(tt.file)
 			if !errors.Is(err, os.ErrNotExist) {
 				t.Errorf("ReadFile() error = %v; want an error wrapping os.ErrNotExist", err)
 			}

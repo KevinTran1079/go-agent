@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func ReadFile(path string) (string, error) {
-	data, err := os.ReadFile(path)
+func ReadFile(file string) (string, error) {
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return "", fmt.Errorf("could not read file: %w", err)
 	}

@@ -27,11 +27,33 @@ func NewClient(ctx context.Context, apiKey, model string) (*Client, error) {
 }
 
 func (c *Client) GenerateContent(ctx context.Context, prompt []*genai.Content) (*genai.GenerateContentResponse, error) {
+	config := &genai.GenerateContentConfig{
+		Tools: []*genai.Tool{
+			{
+				FunctionDeclarations: []*genai.FunctionDeclaration{
+					{
+						Name:        "read_file",
+						Description: "Read the text contents of a file.",
+						Parameters: &genai.Schema{
+							Type: genai.TypeObject,
+							Properties: map[string]*genai.Schema{
+								"path": {
+									Type:        genai.TypeString,
+									Description: "file name to read",
+								},
+							},
+							Required: []string{"path"},
+						},
+					},
+				},
+			},
+		},
+	}
 	resp, err := c.client.Models.GenerateContent(
 		ctx,
 		c.model,
 		prompt,
-		nil,
+		config,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("generate content: %w", err)

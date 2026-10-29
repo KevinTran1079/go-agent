@@ -62,6 +62,13 @@ func Run(ctx context.Context, messages []*genai.Content, model llm.LLM) error {
 
 		messages = append(messages, resp.Candidates[0].Content)
 		fmt.Println("model:", resp.Text())
+
+		if len(resp.FunctionCalls()) > 0 {
+			for _, fn := range resp.FunctionCalls() {
+				fmt.Println(fn.Name, fn.Args)
+			}
+		}
+
 		fmt.Print("you: ")
 		if !scanner.Scan() {
 			return scanner.Err()
